@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forma Studio — Creative Agency</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Epilogue:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f5f0e8;
+    --paper: #ede8df;
+    --ink: #1c1a16;
+    --rust: #c94f2b;
+    --sage: #6b7c5e;
+    --stone: #9e9789;
+    --warm-white: #faf8f3;
+    --nav-h: 64px;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Epilogue', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--rust);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s ease, width 0.3s ease, height 0.3s ease, background 0.3s;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--rust);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%,-50%);
+    transition: transform 0.12s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s;
+    opacity: 0.5;
+  }
+
+  body:hover .cursor { opacity: 1; }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--nav-h);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 0 3rem;
+    transition: background 0.5s ease, border-bottom 0.5s ease;
+    mix-blend-mode: normal;
+  }
+
+  nav.scrolled {
+    background: rgba(245,240,232,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(28,26,22,0.08);
+  }
+
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    margin-right: auto;
+  }
+
+  .nav-logo em { font-style: italic; color: var(--rust); }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone);
+    text-decoration: none;
+    transition: color 0.25s;
+    position: relative;
+  }
+
+  .nav-links a:hover { color: var(--ink); }
+
+  .nav-links a.nav-cta {
+    color: var(--warm-white);
+    background: var(--ink);
+    padding: 0.5rem 1.3rem;
+    letter-spacing: 0.1em;
+    transition: background 0.25s;
+  }
+
+  .nav-links a.nav-cta:hover { background: var(--rust); color: var(--warm-white); }
+
+  /* Hamburger */
+  .nav-hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+
+  .nav-hamburger span {
+    display: block; width: 22px; height: 1.5px;
+    background: var(--ink);
+    transition: all 0.3s;
+  }
+
+  .nav-hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+  .nav-hamburger.open span:nth-child(2) { opacity: 0; width: 0; }
+  .nav-hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+  .mobile-nav {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--ink);
+    z-index: 99;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2.5rem;
+  }
+
+  .mobile-nav.open { display: flex; }
+
+  .mobile-nav a {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--cream);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .mobile-nav a:hover { color: var(--rust); }
+
+  /* ── HERO ── */
+  #home {
+    min-height: 100vh;
+    padding-top: var(--nav-h);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 5rem 3rem 5rem 3rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero-eyebrow-line {
+    width: 32px; height: 1px;
+    background: var(--rust);
+  }
+
+  .hero-eyebrow span {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+  }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3.5rem, 6vw, 6.5rem);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--rust);
+    display: block;
+  }
+
+  .hero-body {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--stone);
+    max-width: 380px;
+    margin-bottom: 3rem;
+  }
+
+  .hero-ctas {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 0.9rem 2.2rem;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.25s, transform 0.25s;
+  }
+
+  .btn-primary:hover { background: var(--rust); transform: translateY(-2px); }
+
+  .btn-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--stone);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+    padding-bottom: 2px;
+  }
+
+  .btn-text:hover { color: var(--ink); border-color: var(--ink); }
+
+  .hero-right {
+    position: relative;
+    background: var(--paper);
+    overflow: hidden;
+  }
+
+  .hero-right-inner {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-shape-outer {
+    width: 380px; height: 480px;
+    position: relative;
+  }
+
+  .hero-shape {
+    position: absolute;
+    border-radius: 2px;
+  }
+
+  .hero-shape:nth-child(1) {
+    width: 300px; height: 380px;
+    background: var(--sage);
+    opacity: 0.15;
+    top: 0; left: 0;
+  }
+
+  .hero-shape:nth-child(2) {
+    width: 260px; height: 320px;
+    border: 2px solid var(--rust);
+    top: 40px; left: 60px;
+    opacity: 0.3;
+  }
+
+  .hero-shape:nth-child(3) {
+    width: 160px; height: 200px;
+    background: var(--rust);
+    opacity: 0.08;
+    bottom: 0; right: 0;
+  }
+
+  .hero-number {
+    position: absolute;
+    bottom: 3rem; left: 3rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 8rem;
+    font-weight: 900;
+    color: rgba(28,26,22,0.05);
+    line-height: 1;
+    user-select: none;
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 2.5rem; right: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stone);
+    writing-mode: vertical-rl;
+  }
+
+  .hero-scroll-hint::after {
+    content: '';
+    width: 1px; height: 48px;
+    background: linear-gradient(to bottom, var(--stone), transparent);
+  }
+
+  /* ── MARQUEE ── */
+  .marquee-section {
+    background: var(--ink);
+    padding: 1.2rem 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(245,240,232,0.08);
+    border-bottom: 1px solid rgba(245,240,232,0.08);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 18s linear infinite;
+    white-space: nowrap;
+    width: max-content;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .marquee-item {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: rgba(245,240,232,0.35);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .marquee-dot { color: var(--rust); margin: 0 0.5rem; }
+
+  /* ── ABOUT ── */
+  #about {
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    min-height: 80vh;
+  }
+
+  .about-left {
+    background: var(--paper);
+    padding: 6rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .section-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--stone);
+    margin-bottom: 4rem;
+  }
+
+  .about-stat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .about-stat { border-top: 1px solid rgba(28,26,22,0.12); padding-top: 1.5rem; }
+
+  .about-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .about-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-top: 0.3rem;
+  }
+
+  .about-right {
+    padding: 6rem 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .section-tag::before { content: ''; display: block; width: 24px; height: 1px; background: var(--rust); }
+
+  .section-heading {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 4vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+  }
+
+  .section-heading em { font-style: italic; color: var(--rust); }
+
+  .section-body {
+    font-size: 1rem;
+    line-height: 1.9;
+    color: var(--stone);
+    max-width: 480px;
+    margin-bottom: 2rem;
+  }
+
+  /* ── SERVICES ── */
+  #services {
+    padding: 8rem 3rem;
+    background: var(--warm-white);
+  }
+
+  .services-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: rgba(28,26,22,0.1);
+    border: 1px solid rgba(28,26,22,0.1);
+  }
+
+  .service-item {
+    background: var(--warm-white);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.35s;
+    cursor: default;
+  }
+
+  .service-item:hover { background: var(--ink); }
+  .service-item:hover .service-num,
+  .service-item:hover .service-title,
+  .service-item:hover .service-desc { color: var(--cream); }
+  .service-item:hover .service-bar { background: var(--rust); }
+
+  .service-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--stone);
+    margin-bottom: 2.5rem;
+    transition: color 0.35s;
+  }
+
+  .service-bar {
+    width: 28px; height: 2px;
+    background: var(--rust);
+    margin-bottom: 1.5rem;
+    transition: background 0.35s, width 0.35s;
+  }
+
+  .service-item:hover .service-bar { width: 48px; }
+
+  .service-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    transition: color 0.35s;
+  }
+
+  .service-desc {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--stone);
+    transition: color 0.35s;
+  }
+
+  /* ── WORK ── */
+  #work {
+    padding: 8rem 0;
+    background: var(--cream);
+    overflow: hidden;
+  }
+
+  .work-header {
+    padding: 0 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  /* Horizontal scroll on desktop */
+  .work-scroll {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0 3rem 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .work-scroll::-webkit-scrollbar { display: none; }
+
+  .work-card {
+    flex: 0 0 380px;
+    height: 480px;
+    border-radius: 2px;
+    scroll-snap-align: start;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .work-card-bg {
+    position: absolute;
+    inset: 0;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+
+  .work-card:hover .work-card-bg { transform: scale(1.04); }
+
+  .work-card:nth-child(1) .work-card-bg { background: linear-gradient(160deg, #2c2420 0%, #6b3a2a 100%); }
+  .work-card:nth-child(2) .work-card-bg { background: linear-gradient(160deg, #1e2a1e 0%, #3d5c3a 100%); }
+  .work-card:nth-child(3) .work-card-bg { background: linear-gradient(160deg, #1a1a2e 0%, #3a3a5c 100%); }
+  .work-card:nth-child(4) .work-card-bg { background: linear-gradient(160deg, #2a2218 0%, #6b5a2a 100%); }
+
+  .work-card-deco {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+  }
+
+  .work-card:nth-child(1) .work-card-deco {
+    background: radial-gradient(circle at 70% 30%, rgba(201,79,43,0.6), transparent 50%);
+  }
+  .work-card:nth-child(2) .work-card-deco {
+    background: radial-gradient(circle at 30% 70%, rgba(107,124,94,0.8), transparent 50%);
+  }
+  .work-card:nth-child(3) .work-card-deco {
+    background: radial-gradient(circle at 60% 40%, rgba(100,100,180,0.6), transparent 50%);
+  }
+  .work-card:nth-child(4) .work-card-deco {
+    background: radial-gradient(circle at 50% 50%, rgba(201,150,43,0.6), transparent 50%);
+  }
+
+  .work-card-content {
+    position: absolute;
+    inset: 0;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .work-card-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.5);
+    border: 1px solid rgba(245,240,232,0.2);
+    padding: 0.3rem 0.8rem;
+    align-self: flex-start;
+  }
+
+  .work-card-bottom h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--cream);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.5rem;
+  }
+
+  .work-card-bottom p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: rgba(245,240,232,0.4);
+    text-transform: uppercase;
+  }
+
+  .work-card-arrow {
+    position: absolute;
+    top: 2.5rem; right: 2.5rem;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(245,240,232,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(245,240,232,0.5);
+    font-size: 1rem;
+    opacity: 0;
+    transform: translate(5px,-5px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+
+  .work-card:hover .work-card-arrow { opacity: 1; transform: translate(0,0); }
+
+  /* ── PROCESS ── */
+  #process {
+    padding: 8rem 3rem;
+    background: var(--paper);
+  }
+
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3rem;
+    margin-top: 4rem;
+  }
+
+  .process-step {
+    position: relative;
+    padding-top: 2rem;
+    border-top: 2px solid var(--rust);
+  }
+
+  .process-step-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 900;
+    color: rgba(28,26,22,0.06);
+    line-height: 1;
+    position: absolute;
+    top: -1.5rem; right: 0;
+  }
+
+  .process-step h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    margin-top: 0.5rem;
+  }
+
+  .process-step p {
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: var(--stone);
+  }
+
+  /* ── CONTACT ── */
+  #contact {
+    background: var(--ink);
+    padding: 8rem 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #contact::before {
+    content: 'HELLO';
+    position: absolute;
+    bottom: -2rem; right: -1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 16rem;
+    font-weight: 900;
+    font-style: italic;
+    color: rgba(245,240,232,0.025);
+    line-height: 1;
+    user-select: none;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6rem;
+    align-items: start;
+  }
+
+  .contact-left .section-tag { color: var(--rust); }
+  .contact-left .section-tag::before { background: var(--rust); }
+
+  .contact-left .section-heading { color: var(--cream); }
+  .contact-left .section-heading em { color: var(--rust); }
+
+  .contact-left .section-body { color: rgba(245,240,232,0.45); }
+
+  .contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .contact-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border-top: 1px solid rgba(245,240,232,0.08);
+    padding-top: 1.5rem;
+  }
+
+  .contact-detail-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.3);
+  }
+
+  .contact-detail-value {
+    font-size: 0.95rem;
+    color: var(--cream);
+    font-weight: 400;
+  }
+
+  /* Contact form */
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-field {
+    border-bottom: 1px solid rgba(245,240,232,0.12);
+    padding: 1.2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color 0.25s;
+  }
+
+  .form-field:focus-within { border-color: var(--rust); }
+
+  .form-field label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(245,240,232,0.3);
+    transition: color 0.25s;
+  }
+
+  .form-field:focus-within label { color: var(--rust); }
+
+  .form-field input,
+  .form-field textarea,
+  .form-field select {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: 'Epilogue', sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    color: var(--cream);
+    width: 100%;
+    resize: none;
+  }
+
+  .form-field textarea { min-height: 80px; }
+
+  .form-field input::placeholder,
+  .form-field textarea::placeholder { color: rgba(245,240,232,0.2); }
+
+  .form-field select option { background: var(--ink); }
+
+  .form-submit {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 2.5rem;
+  }
+
+  .submit-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink);
+    background: var(--cream);
+    border: none;
+    padding: 1rem 2.5rem;
+    cursor: pointer;
+    transition: background 0.25s, color 0.25s;
+  }
+
+  .submit-btn:hover { background: var(--rust); color: #fff; }
+
+  .submit-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: rgba(245,240,232,0.2);
+    text-align: right;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--cream);
+    border-top: 1px solid rgba(28,26,22,0.1);
+    padding: 2rem 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  footer .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  footer .footer-logo em { font-style: italic; color: var(--rust); }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+
+  .footer-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stone);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--rust); }
+
+  footer .footer-copy {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    color: var(--stone);
+  }
+
+  /* ── REVEAL ANIMATIONS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.8s cubic-bezier(0.25,0.46,0.45,0.94),
+                transform 0.8s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+
+  .reveal.visible { opacity: 1; transform: none; }
+
+  .reveal-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal-left.visible { opacity: 1; transform: none; }
+
+  .delay-1 { transition-delay: 0.1s; }
+  .delay-2 { transition-delay: 0.2s; }
+  .delay-3 { transition-delay: 0.3s; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    #home { grid-template-columns: 1fr; }
+    .hero-right { display: none; }
+    .hero-left { padding: 5rem 2rem 4rem; justify-content: flex-end; min-height: 100vh; }
+    #about { grid-template-columns: 1fr; }
+    .about-left { padding: 4rem 2rem; }
+    .about-right { padding: 4rem 2rem; }
+    .about-stat-list { flex-direction: row; flex-wrap: wrap; }
+    .about-stat { flex: 1 1 120px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+    .process-grid { grid-template-columns: 1fr 1fr; }
+    nav { padding: 0 1.5rem; }
+    .nav-links { display: none; }
+    .nav-hamburger { display: flex; }
+    footer { padding: 2rem 1.5rem; flex-direction: column; align-items: flex-start; }
+  }
+
+  @media (max-width: 600px) {
+    .process-grid { grid-template-columns: 1fr; }
+    #services, #work, #process, #contact { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .work-header { padding: 0 1.5rem; }
+    .work-scroll { padding: 0 1.5rem 1rem; }
+    .work-card { flex: 0 0 300px; height: 380px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#home" class="nav-logo">For<em>ma</em></a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact" class="nav-cta">Start a project</a></li>
+  </ul>
+  <button class="nav-hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#about" onclick="closeMobile()">About</a>
+  <a href="#services" onclick="closeMobile()">Services</a>
+  <a href="#work" onclick="closeMobile()">Work</a>
+  <a href="#process" onclick="closeMobile()">Process</a>
+  <a href="#contact" onclick="closeMobile()">Contact</a>
+</div>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <div class="hero-eyebrow-line"></div>
+      <span>Creative Studio — Est. 2019</span>
+    </div>
+    <h1 class="hero-headline">
+      We craft<br>
+      <em>beautiful</em>
+      digital things
+    </h1>
+    <p class="hero-body">
+      Forma is a boutique creative studio specialising in brand identity, web design and immersive digital experiences for forward-thinking clients.
+    </p>
+    <div class="hero-ctas">
+      <a href="#work" class="btn-primary">View Our Work</a>
+      <a href="#about" class="btn-text">Our Story →</a>
+    </div>
+    <div class="hero-scroll-hint">Scroll</div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-right-inner">
+      <div class="hero-shape-outer">
+        <div class="hero-shape"></div>
+        <div class="hero-shape"></div>
+        <div class="hero-shape"></div>
+      </div>
+    </div>
+    <div class="hero-number">01</div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">Brand Identity<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Web Design<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Digital Strategy<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Motion Design<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Art Direction<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">UX Research<span class="marquee-dot">✦</span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="marquee-item">Brand Identity<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Web Design<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Digital Strategy<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Motion Design<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">Art Direction<span class="marquee-dot">✦</span></span>
+    <span class="marquee-item">UX Research<span class="marquee-dot">✦</span></span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-left">
+    <div class="section-num reveal">02 — About</div>
+    <div class="about-stat-list reveal delay-1">
+      <div class="about-stat">
+        <div class="about-stat-num">7+</div>
+        <div class="about-stat-label">Years Active</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">150</div>
+        <div class="about-stat-label">Projects</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">98%</div>
+        <div class="about-stat-label">Satisfaction</div>
+      </div>
+      <div class="about-stat">
+        <div class="about-stat-num">24</div>
+        <div class="about-stat-label">Team Members</div>
+      </div>
+    </div>
+  </div>
+  <div class="about-right">
+    <div class="section-tag reveal">Who we are</div>
+    <h2 class="section-heading reveal delay-1">Design that<br><em>means</em> something.</h2>
+    <p class="section-body reveal delay-2">
+      We believe great design is more than aesthetics — it's the clearest expression of an idea. Founded in 2019, Forma has grown into a studio of passionate makers who obsess over every detail from concept to pixel.
+    </p>
+    <p class="section-body reveal delay-3">
+      We work with ambitious brands, startups and cultural institutions to create identities and digital experiences that stand the test of time.
+    </p>
+    <a href="#contact" class="btn-primary reveal delay-3" style="align-self:flex-start">Work with us</a>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="services-header">
+    <div>
+      <div class="section-tag reveal">What we offer</div>
+      <h2 class="section-heading reveal delay-1">Our <em>craft</em></h2>
+    </div>
+    <a href="#contact" class="btn-text reveal">All services →</a>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-item">
+      <div class="service-num">01</div>
+      <div class="service-bar"></div>
+      <h3 class="service-title">Brand Identity</h3>
+      <p class="service-desc">Logos, visual systems and brand guidelines that communicate your values with clarity and distinction.</p>
+    </div>
+    <div class="service-item">
+      <div class="service-num">02</div>
+      <div class="service-bar"></div>
+      <h3 class="service-title">Web Design</h3>
+      <p class="service-desc">Thoughtfully crafted websites and interfaces that balance beauty, function and conversion.</p>
+    </div>
+    <div class="service-item">
+      <div class="service-num">03</div>
+      <div class="service-bar"></div>
+      <h3 class="service-title">Art Direction</h3>
+      <p class="service-desc">Creative direction and visual storytelling for campaigns, editorial and digital content.</p>
+    </div>
+    <div class="service-item">
+      <div class="service-num">04</div>
+      <div class="service-bar"></div>
+      <h3 class="service-title">Digital Strategy</h3>
+      <p class="service-desc">Data-informed strategy to position your brand, grow your audience and hit your goals.</p>
+    </div>
+    <div class="service-item">
+      <div class="service-num">05</div>
+      <div class="service-bar"></div>
+      <h3 class="service-title">Motion & Video</h3>
+      <p class="service-desc">Animations, brand films and motion graphics that bring your story to life in vivid detail.</p>
+    </div>
+    <div class="service-item">
+      <div class="service-num">06</div>
+      <div class="service-bar"></div>
+      <h3 class="service-title">UX Research</h3>
+      <p class="service-desc">User research, testing and journey mapping to ensure your product truly serves its audience.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="work-header">
+    <div>
+      <div class="section-tag reveal">Portfolio</div>
+      <h2 class="section-heading reveal delay-1">Selected <em>work</em></h2>
+    </div>
+    <a href="#" class="btn-text reveal">All projects →</a>
+  </div>
+  <div class="work-scroll">
+    <div class="work-card">
+      <div class="work-card-bg"></div>
+      <div class="work-card-deco"></div>
+      <div class="work-card-content">
+        <div class="work-card-tag">Brand Identity</div>
+        <div class="work-card-arrow">↗</div>
+        <div class="work-card-bottom">
+          <h3>Ember Coffee Roasters</h3>
+          <p>Identity · Packaging · Web</p>
+        </div>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg"></div>
+      <div class="work-card-deco"></div>
+      <div class="work-card-content">
+        <div class="work-card-tag">Web Platform</div>
+        <div class="work-card-arrow">↗</div>
+        <div class="work-card-bottom">
+          <h3>Verdure Living</h3>
+          <p>E-Commerce · UX · Strategy</p>
+        </div>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg"></div>
+      <div class="work-card-deco"></div>
+      <div class="work-card-content">
+        <div class="work-card-tag">Digital Experience</div>
+        <div class="work-card-arrow">↗</div>
+        <div class="work-card-bottom">
+          <h3>Noctua Finance</h3>
+          <p>SaaS · Interface · Motion</p>
+        </div>
+      </div>
+    </div>
+    <div class="work-card">
+      <div class="work-card-bg"></div>
+      <div class="work-card-deco"></div>
+      <div class="work-card-content">
+        <div class="work-card-tag">Art Direction</div>
+        <div class="work-card-arrow">↗</div>
+        <div class="work-card-bottom">
+          <h3>Solaris Editorial</h3>
+          <p>Direction · Print · Digital</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process">
+  <div class="section-tag reveal">How we work</div>
+  <h2 class="section-heading reveal delay-1">Our <em>process</em></h2>
+  <div class="process-grid">
+    <div class="process-step reveal delay-1">
+      <div class="process-step-num">01</div>
+      <h3>Discover</h3>
+      <p>We listen first. Deep-dive workshops to understand your brand, goals and audience before a single pixel is placed.</p>
+    </div>
+    <div class="process-step reveal delay-2">
+      <div class="process-step-num">02</div>
+      <h3>Define</h3>
+      <p>Strategy and creative brief. We align on direction, deliverables and success metrics before moving to design.</p>
+    </div>
+    <div class="process-step reveal delay-3">
+      <div class="process-step-num">03</div>
+      <h3>Design</h3>
+      <p>Concept through to craft. Iterative design with transparent feedback loops and rapid prototyping at every stage.</p>
+    </div>
+    <div class="process-step reveal" style="transition-delay:0.4s">
+      <div class="process-step-num">04</div>
+      <h3>Deliver</h3>
+      <p>Polished hand-off with full documentation. We stay on as a partner through launch and beyond.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-grid">
+    <div class="contact-left">
+      <div class="section-tag reveal">Get in touch</div>
+      <h2 class="section-heading reveal delay-1">Let's make<br>something <em>great</em>.</h2>
+      <p class="section-body reveal delay-2">We're selective about the projects we take on — so we can give each one everything we've got. Tell us about yours.</p>
+      <div class="contact-details reveal delay-3">
+        <div class="contact-detail-item">
+          <div class="contact-detail-label">Email</div>
+          <div class="contact-detail-value">hello@forma.studio</div>
+        </div>
+        <div class="contact-detail-item">
+          <div class="contact-detail-label">Phone</div>
+          <div class="contact-detail-value">+1 (415) 000-9876</div>
+        </div>
+        <div class="contact-detail-item">
+          <div class="contact-detail-label">Location</div>
+          <div class="contact-detail-value">San Francisco, CA — Remote Friendly</div>
+        </div>
+      </div>
+    </div>
+    <form class="contact-form reveal delay-2" onsubmit="handleSubmit(event)">
+      <div class="form-field">
+        <label>Your Name</label>
+        <input type="text" placeholder="Jane Smith" required>
+      </div>
+      <div class="form-field">
+        <label>Email Address</label>
+        <input type="email" placeholder="jane@company.com" required>
+      </div>
+      <div class="form-field">
+        <label>Budget Range</label>
+        <select>
+          <option value="">Select a range...</option>
+          <option>Under $5,000</option>
+          <option>$5,000 – $15,000</option>
+          <option>$15,000 – $50,000</option>
+          <option>$50,000+</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label>Tell Us About Your Project</label>
+        <textarea placeholder="Describe your goals, timeline and anything else relevant..."></textarea>
+      </div>
+      <div class="form-submit">
+        <button type="submit" class="submit-btn" id="submitBtn">Send Message</button>
+        <span class="submit-note">We reply within 24 hrs</span>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#home" class="footer-logo">For<em>ma</em></a>
+  <ul class="footer-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <span class="footer-copy">© 2024 Forma Studio</span>
+</footer>
+
+<script>
+  // ── Custom cursor ──
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  (function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  })();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '6px';
+      cursor.style.height = '6px';
+      ring.style.width = '52px';
+      ring.style.height = '52px';
+      ring.style.opacity = '0.8';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '10px';
+      cursor.style.height = '10px';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+      ring.style.opacity = '0.5';
+    });
+  });
+
+  // ── Scroll nav ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 80);
+  });
+
+  // ── Mobile nav ──
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobileNav');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileNav.classList.toggle('open');
+    document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : '';
+  });
+
+  function closeMobile() {
+    hamburger.classList.remove('open');
+    mobileNav.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // ── Scroll reveal ──
+  const revealEls = document.querySelectorAll('.reveal, .reveal-left');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  revealEls.forEach(el => observer.observe(el));
+
+  // ── Form submit ──
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = '✓ Sent — We\'ll be in touch';
+    btn.style.background = 'var(--sage)';
+    btn.style.color = '#fff';
+    setTimeout(() => {
+      btn.textContent = 'Send Message';
+      btn.style.background = '';
+      btn.style.color = '';
+      e.target.reset();
+    }, 4000);
+  }
+</script>
+</body>
+</html>

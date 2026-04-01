@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizCraft</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@300;400&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #f4efe6;
+    --paper: #ede7db;
+    --ink: #1c1a14;
+    --rust: #c94f2b;
+    --sage: #6b7c5e;
+    --stone: #9e9789;
+    --muted: #c8c0b0;
+    --correct: #4a8c5c;
+    --wrong: #c94f2b;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body {
+    min-height: 100vh;
+    background: var(--cream);
+    font-family: 'Epilogue', sans-serif;
+    font-weight: 300;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 1rem 4rem;
+  }
+
+  /* ── TOP BAR ── */
+  .top-bar {
+    width: 100%;
+    max-width: 720px;
+    padding: 1.8rem 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+  }
+
+  .top-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+  }
+
+  .top-logo em { font-style: italic; color: var(--rust); }
+
+  .score-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    padding: 0.5rem 1.1rem;
+  }
+
+  .score-pill span { color: var(--rust); font-weight: 500; }
+
+  /* ── SCREENS ── */
+  .screen { display: none; width: 100%; max-width: 720px; }
+  .screen.active { display: block; animation: fadeUp 0.4s ease; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── HOME ── */
+  .home-hero {
+    border: 1px solid rgba(28,26,20,0.12);
+    padding: 4rem 3rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  .home-hero-bg {
+    position: absolute;
+    bottom: -2rem; right: -1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: 14rem;
+    font-weight: 900;
+    font-style: italic;
+    color: rgba(28,26,20,0.04);
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .home-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 1.5rem;
+  }
+
+  .home-eyebrow::before { content: ''; width: 24px; height: 1px; background: var(--rust); }
+
+  .home-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.5rem, 7vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .home-hero h1 em { font-style: italic; color: var(--rust); }
+
+  .home-hero p {
+    color: var(--stone);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    max-width: 420px;
+    position: relative;
+  }
+
+  /* Config grid */
+  .config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(28,26,20,0.1);
+    border: 1px solid rgba(28,26,20,0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .config-cell {
+    background: var(--cream);
+    padding: 1.8rem;
+  }
+
+  .config-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-bottom: 1rem;
+  }
+
+  .config-options {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .cfg-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1rem;
+    background: transparent;
+    border: 1px solid rgba(28,26,20,0.2);
+    color: var(--stone);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cfg-btn:hover { border-color: var(--ink); color: var(--ink); }
+  .cfg-btn.sel { background: var(--ink); color: var(--cream); border-color: var(--ink); }
+
+  .start-btn {
+    width: 100%;
+    padding: 1.1rem 2rem;
+    background: var(--rust);
+    color: var(--cream);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .start-btn:hover { background: var(--ink); }
+
+  /* ── QUIZ ── */
+  .quiz-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .q-progress-bar {
+    flex: 1;
+    min-width: 200px;
+    height: 3px;
+    background: rgba(28,26,20,0.1);
+  }
+
+  .q-progress-fill {
+    height: 100%;
+    background: var(--rust);
+    transition: width 0.5s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  .q-counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--stone);
+    white-space: nowrap;
+  }
+
+  .q-counter em { color: var(--rust); font-style: normal; }
+
+  /* Timer */
+  .timer-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    min-width: 60px;
+  }
+
+  .timer-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--ink);
+    line-height: 1;
+    transition: color 0.3s;
+  }
+
+  .timer-num.urgent { color: var(--rust); }
+
+  .timer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* Question card */
+  .question-card {
+    border: 1px solid rgba(28,26,20,0.12);
+    background: var(--paper);
+    padding: 2.5rem 2.5rem 2rem;
+    margin-bottom: 1.2rem;
+    position: relative;
+  }
+
+  .q-type-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 0.25rem 0.7rem;
+    border: 1px solid rgba(28,26,20,0.15);
+    color: var(--stone);
+    margin-bottom: 1.5rem;
+  }
+
+  .q-type-tag.multi { border-color: rgba(107,124,94,0.4); color: var(--sage); }
+  .q-type-tag.fill { border-color: rgba(201,79,43,0.3); color: var(--rust); }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .multi-note {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-top: 1rem;
+  }
+
+  /* Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(28,26,20,0.1);
+    border: 1px solid rgba(28,26,20,0.1);
+    margin-bottom: 1.2rem;
+  }
+
+  .opt-btn {
+    background: var(--cream);
+    border: none;
+    padding: 1.3rem 1.5rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s;
+    font-family: 'Epilogue', sans-serif;
+  }
+
+  .opt-btn:hover:not(:disabled) { background: var(--paper); }
+  .opt-btn.selected { background: rgba(28,26,20,0.05); }
+  .opt-btn.correct { background: rgba(74,140,92,0.08); }
+  .opt-btn.wrong { background: rgba(201,79,43,0.06); }
+  .opt-btn:disabled { cursor: default; }
+
+  .opt-letter {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--muted);
+    line-height: 1;
+    min-width: 1.2rem;
+    transition: color 0.2s;
+  }
+
+  .opt-btn:hover:not(:disabled) .opt-letter { color: var(--rust); }
+  .opt-btn.selected .opt-letter { color: var(--rust); }
+  .opt-btn.correct .opt-letter { color: var(--correct); }
+  .opt-btn.wrong .opt-letter { color: var(--wrong); }
+
+  .opt-text {
+    font-size: 0.9rem;
+    color: var(--ink);
+    line-height: 1.4;
+    font-weight: 400;
+    padding-top: 0.1rem;
+  }
+
+  /* Fill input */
+  .fill-area {
+    border: 1px solid rgba(28,26,20,0.12);
+    margin-bottom: 1.2rem;
+    background: var(--cream);
+  }
+
+  .fill-input {
+    width: 100%;
+    padding: 1.3rem 1.5rem;
+    border: none;
+    background: transparent;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--ink);
+    outline: none;
+    letter-spacing: -0.01em;
+  }
+
+  .fill-input::placeholder { color: var(--muted); font-weight: 400; font-style: italic; }
+  .fill-area.correct { border-color: var(--correct); }
+  .fill-area.wrong { border-color: var(--wrong); }
+
+  .fill-submit {
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .fill-submit:hover { background: var(--rust); }
+
+  /* Feedback */
+  .feedback-bar {
+    display: none;
+    padding: 1rem 1.5rem;
+    border: 1px solid;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.2rem;
+    animation: feedIn 0.3s ease;
+  }
+
+  @keyframes feedIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+  .feedback-bar.correct-fb { border-color: rgba(74,140,92,0.3); color: var(--correct); background: rgba(74,140,92,0.05); display: block; }
+  .feedback-bar.wrong-fb { border-color: rgba(201,79,43,0.25); color: var(--wrong); background: rgba(201,79,43,0.04); display: block; }
+
+  .next-btn {
+    width: 100%;
+    padding: 1rem;
+    background: var(--rust);
+    color: var(--cream);
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    display: none;
+    transition: background 0.2s;
+  }
+
+  .next-btn:hover { background: var(--ink); }
+  .next-btn.vis { display: block; }
+
+  /* ── RESULTS ── */
+  .results-hero-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0;
+    border: 1px solid rgba(28,26,20,0.12);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+
+  .results-score-block {
+    background: var(--ink);
+    padding: 3rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 180px;
+  }
+
+  .result-big {
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    font-style: italic;
+    color: var(--rust);
+    line-height: 1;
+  }
+
+  .result-pct-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: rgba(244,239,230,0.3);
+    margin-top: 0.4rem;
+  }
+
+  .results-text-block {
+    padding: 2.5rem;
+    background: var(--paper);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .results-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+  }
+
+  .results-sub {
+    color: var(--stone);
+    font-size: 0.88rem;
+    line-height: 1.6;
+  }
+
+  .results-stats {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 1px;
+    background: rgba(28,26,20,0.1);
+    border: 1px solid rgba(28,26,20,0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .res-stat {
+    background: var(--cream);
+    padding: 1.5rem;
+  }
+
+  .res-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .res-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--stone);
+    margin-top: 0.4rem;
+  }
+
+  .results-actions {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1px;
+    background: rgba(28,26,20,0.1);
+    border: 1px solid rgba(28,26,20,0.1);
+  }
+
+  .res-btn {
+    padding: 1rem;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .res-btn-home { background: var(--paper); color: var(--stone); }
+  .res-btn-home:hover { background: var(--cream); color: var(--ink); }
+  .res-btn-play { background: var(--rust); color: var(--cream); }
+  .res-btn-play:hover { background: var(--ink); }
+
+  @media(max-width:600px){
+    .options-grid{grid-template-columns:1fr;}
+    .config-grid{grid-template-columns:1fr;}
+    .results-hero-row{grid-template-columns:1fr;}
+    .results-score-block{padding:2rem; flex-direction:row; gap:1rem;}
+    .results-stats{grid-template-columns:1fr 1fr 1fr;}
+    .top-bar{padding:1.5rem 0 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div class="top-logo">Quiz<em>Craft</em></div>
+  <div class="score-pill">Score <span id="scoreTop">0</span></div>
+</div>
+
+<!-- HOME -->
+<div class="screen active" id="homeScreen">
+  <div class="home-hero">
+    <div class="home-hero-bg">?</div>
+    <div class="home-eyebrow">Knowledge Challenge</div>
+    <h1>Test your<br><em>mind.</em></h1>
+    <p>Four categories, three difficulty levels, three question types. How well do you really know your stuff?</p>
+  </div>
+
+  <div class="config-grid">
+    <div class="config-cell">
+      <div class="config-label">Category</div>
+      <div class="config-options">
+        <button class="cfg-btn sel" data-cat="general" onclick="pickCat(this)">General</button>
+        <button class="cfg-btn" data-cat="science" onclick="pickCat(this)">Science</button>
+        <button class="cfg-btn" data-cat="history" onclick="pickCat(this)">History</button>
+        <button class="cfg-btn" data-cat="tech" onclick="pickCat(this)">Tech</button>
+      </div>
+    </div>
+    <div class="config-cell">
+      <div class="config-label">Difficulty</div>
+      <div class="config-options">
+        <button class="cfg-btn sel" data-diff="easy" onclick="pickDiff(this)">Easy</button>
+        <button class="cfg-btn" data-diff="medium" onclick="pickDiff(this)">Medium</button>
+        <button class="cfg-btn" data-diff="hard" onclick="pickDiff(this)">Hard</button>
+      </div>
+    </div>
+  </div>
+  <button class="start-btn" onclick="startQuiz()">Begin Quiz →</button>
+</div>
+
+<!-- QUIZ -->
+<div class="screen" id="quizScreen">
+  <div class="quiz-meta">
+    <div class="q-counter">Question <em id="qNum">1</em> of <em id="qTotal">10</em></div>
+    <div class="q-progress-bar"><div class="q-progress-fill" id="qFill" style="width:0%"></div></div>
+    <div class="timer-block">
+      <div class="timer-num" id="timerNum">30</div>
+      <div class="timer-label">Seconds</div>
+    </div>
+  </div>
+
+  <div class="question-card">
+    <div class="q-type-tag" id="qTag">Single Choice</div>
+    <div class="question-text" id="qText">Loading...</div>
+    <div class="multi-note" id="multiNote" style="display:none">Select all correct answers</div>
+  </div>
+
+  <div id="optionsWrap">
+    <div class="options-grid" id="optionsGrid"></div>
+  </div>
+
+  <div id="fillWrap" style="display:none">
+    <div class="fill-area" id="fillArea">
+      <input type="text" class="fill-input" id="fillInp" placeholder="Type your answer…" autocomplete="off">
+    </div>
+    <button class="fill-submit" onclick="submitFill()">Submit Answer →</button>
+  </div>
+
+  <div class="feedback-bar" id="feedbackBar"></div>
+  <button class="next-btn" id="nextBtn" onclick="nextQ()">Next Question →</button>
+</div>
+
+<!-- RESULTS -->
+<div class="screen" id="resultsScreen">
+  <div class="results-hero-row">
+    <div class="results-score-block">
+      <div class="result-big" id="resPct">0%</div>
+      <div class="result-pct-label">Score</div>
+    </div>
+    <div class="results-text-block">
+      <div class="results-title" id="resTitle">Well Done!</div>
+      <div class="results-sub" id="resSub">Here's your breakdown.</div>
+    </div>
+  </div>
+  <div class="results-stats">
+    <div class="res-stat">
+      <div class="res-stat-num" style="color:var(--correct)" id="resCorrect">0</div>
+      <div class="res-stat-label">Correct</div>
+    </div>
+    <div class="res-stat">
+      <div class="res-stat-num" style="color:var(--wrong)" id="resWrong">0</div>
+      <div class="res-stat-label">Wrong</div>
+    </div>
+    <div class="res-stat">
+      <div class="res-stat-num" id="resPoints">0</div>
+      <div class="res-stat-label">Points</div>
+    </div>
+  </div>
+  <div class="results-actions">
+    <button class="res-btn res-btn-home" onclick="goHome()">← Home</button>
+    <button class="res-btn res-btn-play" onclick="startQuiz()">Play Again →</button>
+  </div>
+</div>
+
+<script>
+  const QUESTIONS = {
+    general:[
+      {type:'mcq',q:"What is the capital of France?",opts:["London","Berlin","Paris","Madrid"],ans:2},
+      {type:'mcq',q:"How many continents are on Earth?",opts:["5","6","7","8"],ans:2},
+      {type:'multi',q:"Which are planets in our solar system?",opts:["Mars","Pluto","Jupiter","Sun"],ans:[0,2]},
+      {type:'fill',q:"The Great Wall of China is located in ___.",ans:["china"]},
+      {type:'mcq',q:"What is the largest ocean on Earth?",opts:["Atlantic","Indian","Arctic","Pacific"],ans:3},
+      {type:'mcq',q:"How many sides does a hexagon have?",opts:["5","6","7","8"],ans:1},
+      {type:'fill',q:"Water boils at ___ degrees Celsius at sea level.",ans:["100"]},
+      {type:'multi',q:"Which of these are primary colors?",opts:["Red","Green","Blue","Yellow"],ans:[0,2,3]},
+      {type:'mcq',q:"Who painted the Mona Lisa?",opts:["Van Gogh","Picasso","da Vinci","Rembrandt"],ans:2},
+      {type:'mcq',q:"What is the largest mammal on Earth?",opts:["Elephant","Blue Whale","Giraffe","Hippo"],ans:1},
+    ],
+    science:[
+      {type:'mcq',q:"What is the chemical symbol for gold?",opts:["Go","Gd","Au","Ag"],ans:2},
+      {type:'mcq',q:"How many bones are in the adult human body?",opts:["186","206","226","246"],ans:1},
+      {type:'fill',q:"The speed of light is approximately ___ km/s.",ans:["300000","300,000"]},
+      {type:'multi',q:"Which are noble gases?",opts:["Helium","Oxygen","Neon","Argon"],ans:[0,2,3]},
+      {type:'mcq',q:"What planet is known as the Red Planet?",opts:["Venus","Jupiter","Mars","Saturn"],ans:2},
+      {type:'mcq',q:"What is the powerhouse of the cell?",opts:["Nucleus","Ribosome","Mitochondria","Vacuole"],ans:2},
+      {type:'fill',q:"Einstein's famous equation is E = mc___.",ans:["2","²"]},
+      {type:'mcq',q:"How many chromosomes do humans have?",opts:["44","46","48","50"],ans:1},
+      {type:'multi',q:"Which of these are states of matter?",opts:["Solid","Liquid","Gas","Plasma"],ans:[0,1,2,3]},
+      {type:'mcq',q:"What is the atomic number of carbon?",opts:["4","6","8","12"],ans:1},
+    ],
+    history:[
+      {type:'mcq',q:"In what year did World War II end?",opts:["1943","1944","1945","1946"],ans:2},
+      {type:'mcq',q:"Who was the first President of the United States?",opts:["Lincoln","Jefferson","Washington","Adams"],ans:2},
+      {type:'fill',q:"The ancient wonder, the Great ___ of Giza, is located in Egypt.",ans:["pyramid","pyramids"]},
+      {type:'mcq',q:"What year did the Berlin Wall fall?",opts:["1987","1988","1989","1990"],ans:2},
+      {type:'multi',q:"Which countries were part of the Allied Powers in WWII?",opts:["USA","Germany","UK","USSR"],ans:[0,2,3]},
+      {type:'mcq',q:"Who wrote the Declaration of Independence?",opts:["Washington","Jefferson","Madison","Hamilton"],ans:1},
+      {type:'mcq',q:"What ancient civilization built Machu Picchu?",opts:["Aztec","Maya","Inca","Olmec"],ans:2},
+      {type:'fill',q:"Napoleon Bonaparte was exiled to the island of ___.",ans:["saint helena","st helena","elba"]},
+      {type:'mcq',q:"In which year did the Titanic sink?",opts:["1910","1911","1912","1913"],ans:2},
+      {type:'mcq',q:"Who was the first woman to win a Nobel Prize?",opts:["Rosalind Franklin","Ada Lovelace","Marie Curie","Florence Nightingale"],ans:2},
+    ],
+    tech:[
+      {type:'mcq',q:"What does 'CPU' stand for?",opts:["Central Processing Unit","Computer Processing Unit","Central Program Unit","Core Processing Unit"],ans:0},
+      {type:'mcq',q:"Which company created the iPhone?",opts:["Samsung","Google","Apple","Microsoft"],ans:2},
+      {type:'fill',q:"HTML stands for HyperText ___ Language.",ans:["markup"]},
+      {type:'multi',q:"Which of these are programming languages?",opts:["Python","HTML","Java","CSS"],ans:[0,2]},
+      {type:'mcq',q:"What does 'URL' stand for?",opts:["Unified Resource Locator","Universal Resource Locator","Uniform Resource Locator","United Resource Locator"],ans:2},
+      {type:'mcq',q:"Which company owns Android?",opts:["Apple","Microsoft","Amazon","Google"],ans:3},
+      {type:'fill',q:"The shortcut Ctrl+___ is used to paste.",ans:["v"]},
+      {type:'mcq',q:"What does 'RAM' stand for?",opts:["Random Access Memory","Rapid Access Memory","Read Access Memory","Rapid Array Memory"],ans:0},
+      {type:'multi',q:"Which are web browsers?",opts:["Chrome","Firefox","Opera","Photoshop"],ans:[0,1,2]},
+      {type:'mcq',q:"What is the binary representation of the number 5?",opts:["100","101","110","111"],ans:1},
+    ],
+  };
+
+  let cat='general', diff='easy', questions=[], qi=0, score=0, correct=0, wrong=0;
+  let timer=null, timeLeft=30, answered=false, selMulti=[];
+
+  const $=id=>document.getElementById(id);
+  const show=id=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$(id).classList.add('active');}
+
+  function pickCat(btn){document.querySelectorAll('[data-cat]').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');cat=btn.dataset.cat;}
+  function pickDiff(btn){document.querySelectorAll('[data-diff]').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');diff=btn.dataset.diff;}
+
+  function startQuiz(){
+    questions=[...QUESTIONS[cat]].sort(()=>Math.random()-0.5).slice(0,10);
+    qi=0;score=0;correct=0;wrong=0;
+    $('scoreTop').textContent=0;
+    $('qTotal').textContent=questions.length;
+    show('quizScreen');
+    loadQ();
+  }
+
+  function loadQ(){
+    clearInterval(timer);
+    answered=false; selMulti=[];
+    const q=questions[qi];
+    const tLimit=diff==='easy'?30:diff==='medium'?20:12;
+    timeLeft=tLimit;
+
+    $('qNum').textContent=qi+1;
+    $('qFill').style.width=(qi/questions.length*100)+'%';
+    $('qText').textContent=q.q;
+    $('feedbackBar').className='feedback-bar';
+    $('nextBtn').classList.remove('vis');
+    $('timerNum').className='timer-num';
+    $('timerNum').textContent=tLimit;
+
+    // Type tag
+    const tag=$('qTag');
+    if(q.type==='mcq'){tag.textContent='Single Choice';tag.className='q-type-tag';}
+    else if(q.type==='multi'){tag.textContent='Multi Select';tag.className='q-type-tag multi';}
+    else{tag.textContent='Fill in Blank';tag.className='q-type-tag fill';}
+
+    $('multiNote').style.display=q.type==='multi'?'block':'none';
+    $('optionsWrap').style.display=q.type==='fill'?'none':'block';
+    $('fillWrap').style.display=q.type==='fill'?'block':'none';
+
+    if(q.type!=='fill'){
+      const letters=['A','B','C','D'];
+      $('optionsGrid').innerHTML=q.opts.map((o,i)=>`
+        <button class="opt-btn" onclick="pickOpt(this,${i})">
+          <span class="opt-letter">${letters[i]}</span>
+          <span class="opt-text">${o}</span>
+        </button>`).join('');
+
+      if(q.type==='multi'){
+        const sub=document.createElement('button');
+        sub.className='fill-submit'; sub.id='multiSub';
+        sub.textContent='Submit Answers →';
+        sub.onclick=submitMulti;
+        $('optionsWrap').after(sub);
+      }
+    } else {
+      $('fillArea').className='fill-area';
+      $('fillInp').value='';
+      $('fillInp').disabled=false;
+      $('fillWrap').querySelector('.fill-submit').style.display='block';
+    }
+
+    timer=setInterval(()=>{
+      timeLeft--;
+      $('timerNum').textContent=timeLeft;
+      if(timeLeft<=5) $('timerNum').classList.add('urgent');
+      if(timeLeft<=0){clearInterval(timer);if(!answered)timeOut();}
+    },1000);
+  }
+
+  function timeOut(){
+    answered=true; wrong++;
+    showFb(false,'⏱ Time\'s up — '+getAnsText());
+    disableOpts(); removeMultiSub();
+    $('nextBtn').classList.add('vis');
+    $('fillWrap').querySelector&&($('fillWrap').querySelector('.fill-submit').style.display='none');
+  }
+
+  function pickOpt(btn,i){
+    const q=questions[qi];
+    if(answered) return;
+    if(q.type==='mcq'){
+      answered=true; clearInterval(timer);
+      disableOpts();
+      const btns=$('optionsGrid').querySelectorAll('.opt-btn');
+      btn.classList.add(i===q.ans?'correct':'wrong');
+      btns[q.ans].classList.add('correct');
+      if(i===q.ans){const pts=calcPts();score+=pts;correct++;$('scoreTop').textContent=score;showFb(true,`✓ Correct! +${pts} points`);}
+      else{wrong++;showFb(false,'✗ Wrong! '+getAnsText());}
+      $('nextBtn').classList.add('vis');
+    } else {
+      btn.classList.toggle('selected');
+      if(selMulti.includes(i)) selMulti=selMulti.filter(x=>x!==i); else selMulti.push(i);
+    }
+  }
+
+  function submitMulti(){
+    if(answered||!selMulti.length) return;
+    answered=true; clearInterval(timer); removeMultiSub();
+    const q=questions[qi]; disableOpts();
+    const btns=$('optionsGrid').querySelectorAll('.opt-btn');
+    const ok=[...selMulti].sort().join()===([...q.ans]).sort().join();
+    q.ans.forEach(i=>btns[i].classList.add('correct'));
+    selMulti.forEach(i=>{if(!q.ans.includes(i))btns[i].classList.add('wrong');});
+    if(ok){const pts=calcPts()+5;score+=pts;correct++;$('scoreTop').textContent=score;showFb(true,`✓ All correct! +${pts} points`);}
+    else{wrong++;showFb(false,'✗ Not quite right.');}
+    $('nextBtn').classList.add('vis');
+  }
+
+  function submitFill(){
+    if(answered) return;
+    const val=$('fillInp').value.trim().toLowerCase();
+    if(!val) return;
+    answered=true; clearInterval(timer);
+    $('fillInp').disabled=true;
+    $('fillWrap').querySelector('.fill-submit').style.display='none';
+    const q=questions[qi];
+    const ok=q.ans.some(a=>val===a||val.includes(a));
+    $('fillArea').className='fill-area '+(ok?'correct':'wrong');
+    if(ok){const pts=calcPts();score+=pts;correct++;$('scoreTop').textContent=score;showFb(true,`✓ Correct! +${pts} points`);}
+    else{wrong++;showFb(false,`✗ Wrong. Answer: ${q.ans[0]}`);}
+    $('nextBtn').classList.add('vis');
+  }
+
+  function calcPts(){return (diff==='easy'?10:diff==='medium'?15:20)+Math.ceil(timeLeft/4);}
+
+  function getAnsText(){
+    const q=questions[qi];
+    if(q.type==='mcq') return `Answer: ${q.opts[q.ans]}`;
+    if(q.type==='fill') return `Answer: ${q.ans[0]}`;
+    return `Answers: ${q.ans.map(i=>q.opts[i]).join(', ')}`;
+  }
+
+  function showFb(ok,msg){
+    $('feedbackBar').textContent=msg;
+    $('feedbackBar').className='feedback-bar '+(ok?'correct-fb':'wrong-fb');
+  }
+
+  function disableOpts(){$('optionsGrid').querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);}
+  function removeMultiSub(){const s=$('multiSub');if(s)s.remove();}
+
+  function nextQ(){
+    qi++;
+    if(qi>=questions.length) showResults(); else loadQ();
+  }
+
+  function showResults(){
+    clearInterval(timer);
+    const pct=Math.round(correct/questions.length*100);
+    $('resPct').textContent=pct+'%';
+    $('resCorrect').textContent=correct;
+    $('resWrong').textContent=wrong;
+    $('resPoints').textContent=score;
+    const msgs=[[0,39,"Keep going!","Every attempt sharpens the mind."],[40,59,"Good effort.","You're getting there."],[60,79,"Well done.","Solid knowledge."],[80,99,"Excellent!","You really know your stuff."],[100,100,"Perfect!","Flawless — nothing to add."]];
+    const [,,t,s]=msgs.find(([a,b])=>pct>=a&&pct<=b)||msgs[0];
+    $('resTitle').textContent=t; $('resSub').textContent=s;
+    show('resultsScreen');
+  }
+
+  function goHome(){show('homeScreen');}
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Enter'){
+      if($('fillWrap').style.display!=='none'&&!answered) submitFill();
+      else if($('nextBtn').classList.contains('vis')) nextQ();
+    }
+  });
+</script>
+</body>
+</html>
